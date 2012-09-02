@@ -217,6 +217,19 @@ define(function() {
     return result;
   }
 
+  function quaternion_identity(result) {
+    if(result) {
+      result[0] = 0;
+      result[1] = 0;
+      result[2] = 0;
+      result[3] = 1;
+    } else {
+      result = new Quaternion();
+    }
+
+    return result;
+  }
+
   function vector_set(v) {
     var size = v.length;
     var argc = arguments.length - 1;
@@ -412,6 +425,123 @@ define(function() {
 
   }
 
+  function vector_toString(v) {
+    var size = v.length;
+    var result = "[";
+
+    for(var i = 0, l = size; i < l; ++ i) {
+      result += v[i];
+      if(i < l-1) {
+        result += ", ";
+      }
+    }
+    result += "]";
+
+    return result;
+  }
+
+  function vector_toMathML(v) {
+    var size = v.length;
+    var result = "<mfenced><mtable>";
+
+    for(var i = 0, l = size; i < l; ++ i) {
+      result += "<mtr><mtd><mn>" + v[i] + "</mn></mtd></mtr>";
+    }
+    result += "</mtable></mfenced>"
+
+    return result;
+  }
+
+  function matrix2_multiply(m1, m2, result) {
+    result = result || new Matrix(2, 2);
+      
+    var a00 = m1[0], a01 = m1[1], a10 = m1[2], a11 = m1[3];
+    var b00 = m2[0], b01 = m2[1], b10 = m2[2], b11 = m2[3];
+
+    result[0] = a00 * b00 + a01 * b10;
+    result[1] = a00 * b01 + a01 * b11;
+    result[2] = a10 * b00 + a11 * b10;
+    result[3] = a10 * b01 + a11 * b11;
+
+    return result;
+  }
+
+  function matrix3_multiply(m1, m2, result) {
+    // https://github.com/toji/gl-matrix/blob/8d6179c15aa938159feb2cb617d8a3af3fa2c7f3/gl-matrix.js#L682
+    result = result || new Matrix(3, 3);
+        
+    var a00 = m1[0], a01 = m1[1], a02 = m1[2],
+        a10 = m1[3], a11 = m1[4], a12 = m1[5],
+        a20 = m1[6], a21 = m1[7], a22 = m1[8],
+
+        b00 = m2[0], b01 = m2[1], b02 = m2[2],
+        b10 = m2[3], b11 = m2[4], b12 = m2[5],
+        b20 = m2[6], b21 = m2[7], b22 = m2[8];
+
+    result[0] = a00 * b00 + a01 * b10 + a02 * b20;
+    result[1] = a00 * b01 + a01 * b11 + a02 * b21;
+    result[2] = a00 * b02 + a01 * b12 + a02 * b22;
+
+    result[3] = a10 * b00 + a11 * b10 + a12 * b20;
+    result[4] = a10 * b01 + a11 * b11 + a12 * b21;
+    result[5] = a10 * b02 + a11 * b12 + a12 * b22;
+
+    result[6] = a20 * b00 + a21 * b10 + a22 * b20;
+    result[7] = a20 * b01 + a21 * b11 + a22 * b21;
+    result[8] = a20 * b02 + a21 * b12 + a22 * a22;
+
+    return result;
+  }
+
+  function matrix4_multiply(m1, m2, result) {
+    // https://github.com/toji/gl-matrix/blob/8d6179c15aa938159feb2cb617d8a3af3fa2c7f3/gl-matrix.js#L1295
+    result = result || new Matrix(4, 4);
+
+    var a00 = m1[0], a01 = m1[1], a02 = m1[2], a03 = m1[3],
+        a10 = m1[4], a11 = m1[5], a12 = m1[6], a13 = m1[7],
+        a20 = m1[8], a21 = m1[9], a22 = m1[10], a23 = m1[11],
+        a30 = m1[12], a31 = m1[13], a32 = m1[14], a33 = m1[15],
+
+        b00 = m2[0], b01 = m2[1], b02 = m2[2], b03 = m2[3],
+        b10 = m2[4], b11 = m2[5], b12 = m2[6], b13 = m2[7],
+        b20 = m2[8], b21 = m2[9], b22 = m2[10], b23 = m2[11],
+        b30 = m2[12], b31 = m2[13], b32 = m2[14], b33 = m2[15];
+
+    result[0] = a00 * b00 + a01 * b10 + a02 * b20 + a03 * b30;
+    result[1] = a00 * b01 + a01 * b11 + a02 * b21 + a03 * b31;
+    result[2] = a00 * b02 + a01 * b12 + a02 * b22 + a03 * b32;
+    result[3] = a00 * b03 + a01 * b13 + a02 * b23 + a03 * b33;
+    result[4] = a10 * b00 + a11 * b10 + a12 * b20 + a13 * b30;
+    result[5] = a10 * b01 + a11 * b11 + a12 * b21 + a13 * b31;
+    result[6] = a10 * b02 + a11 * b12 + a12 * b22 + a13 * b32;
+    result[7] = a10 * b03 + a11 * b13 + a12 * b23 + a13 * b33;
+    result[8] = a20 * b00 + a21 * b10 + a22 * b20 + a23 * b30;
+    result[9] = a20 * b01 + a21 * b11 + a22 * b21 + a23 * b31;
+    result[10] = a20 * b02 + a21 * b12 + a22 * b22 + a23 * b32;
+    result[11] = a20 * b03 + a21 * b13 + a22 * b23 + a23 * b33;
+    result[12] = a30 * b00 + a31 * b10 + a32 * b20 + a33 * b30;
+    result[13] = a30 * b01 + a31 * b11 + a32 * b21 + a33 * b31;
+    result[14] = a30 * b02 + a31 * b12 + a32 * b22 + a33 * b32;
+    result[15] = a30 * b03 + a31 * b13 + a32 * b23 + a33 * b33;
+
+    return result;
+  }
+
+  function vector_unit(offset, size, result) {
+    if(!result) {
+      result = new Vector(size);
+    } else if(result.length !== size) {
+      throw new Error("result has incorrect length " + result.length + ", expected " + size);
+    }
+
+    for(var i = 0, l = size; i < l; ++ i) {
+      result[i] = 0;
+    }
+    result[offset] = 1;
+
+    return result;
+  }
+
   return {
     // Utility functions
     isTypedArray: isTypedArray,
@@ -458,29 +588,31 @@ define(function() {
       direction: vector_direction,
       extract: vector_extract,
       zero: vector_uniform.bind(undefined, 0),
-      one: vector_uniform.bind(undefined, 1)
+      one: vector_uniform.bind(undefined, 1),
+      toString: vector_toString,
+      toMathML: vector_toMathML
     },
     vector2: {
-      x: undefined,
-      y: undefined,
-      u: undefined,
-      v: undefined
+      x: vector_unit.bind(undefined, 0, 2),
+      y: vector_unit.bind(undefined, 1, 2),
+      u: vector_unit.bind(undefined, 0, 2),
+      v: vector_unit.bind(undefined, 1, 2)
     },
     vector3: {
       cross: vector3_cross,
       unproject: undefined,
-      x: undefined,
-      y: undefined,
-      z: undefined
+      x: vector_unit.bind(undefined, 0, 3),
+      y: vector_unit.bind(undefined, 1, 3),
+      z: vector_unit.bind(undefined, 2, 3)
     },
     vector4: {
-      x: undefined,
-      y: undefined,
-      z: undefined,
-      w: undefined
+      x: vector_unit.bind(undefined, 0, 4),
+      y: vector_unit.bind(undefined, 1, 4),
+      z: vector_unit.bind(undefined, 2, 4),
+      w: vector_unit.bind(undefined, 3, 4)
     },
     quaternion: {
-      identity: undefined,
+      identity: quaternion_identity,
       inverse: undefined,
       conjugate: undefined,
       slerp: undefined,
@@ -490,24 +622,25 @@ define(function() {
       toAxisAngle: undefined,
       fromAxisAngle: undefined
     },
-    matrix: {
-      multiply: undefined,
+    matrix: {      
       inverse: undefined,
       transpose: undefined,
       determinant: undefined,
       get: undefined,
       set: undefined,
       extract: undefined,
-      identity: undefined
+      identity: undefined,
+      toString: undefined,
+      toMathML: undefined
     },
     matrix2: {
-      multiply: undefined,
+      multiply: matrix2_multiply,
       // Convert between rotation matrix and angle
       toAngle: undefined,
       fromAngle: undefined
     },
     matrix3: {
-      multiply: undefined,
+      multiply: matrix3_multiply,
       // Convert between rotation matrix and quaternion
       toQuaternion: undefined,
       fromQuaternion: undefined,
@@ -516,7 +649,7 @@ define(function() {
       fromAxisAngle: undefined
     },
     matrix4: {
-      multiply: undefined,
+      multiply: matrix4_multiply,
     },
     transform: {
       translate: undefined,
