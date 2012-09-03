@@ -70,22 +70,46 @@
   /*
    * Constructors
    */
-  var HEADER_SIZE = 1;  // allocation header size (4 bytes)
-  var ELEMENT_SIZE = 4;
+  var ARRAY_TYPE = Float32Array;
+  var HEADER_SIZE = 1;  // allocation header size (in elements)
+  var ELEMENT_SIZE = ARRAY_TYPE.BYTES_PER_ELEMENT;
 
-  function Matrix(rows, columns) {
+  function Matrix(arg0, arg1) {
     var argc = arguments.length;
-    if(2 === argc) {
-      var size = rows * columns + HEADER_SIZE;
-      // Allocate an ArrayBuffer to hold a header and data, then create a view
-      // for the data only. Internally, we will access the header directly from the buffer,
-      // but this way the header stays out of the way for client code.
-      var matrix = new Float32Array(new ArrayBuffer(size * ELEMENT_SIZE), HEADER_SIZE * ELEMENT_SIZE);
-      writeHeader(matrix, DIMENSION, columns);
-      return matrix;
+    var rows, columns, size, matrix, values;
+    if(1 === argc) {
+      // Argument is an array of values
+      if(Array.isArray(arg0)) {
+        rows = arg0.length;
+        columns = arg0[0].length;
+        size = rows * columns + HEADER_SIZE;
+        values = arg0;
+      }
+    } else if(2 === argc) {
+      // Arguments are rows and columns
+      rows = arg0;
+      columns = arg1;
+      size = rows * columns + HEADER_SIZE;
     } else {
       throw new Error("invalid constructor invocation");
     }
+
+    // NOTE: Allocate an ArrayBuffer to hold a header and data, then create a view
+    // for the data only. Internally, we will access the header directly from the buffer,
+    // but this way the header stays out of the way for client code.
+    matrix = new ARRAY_TYPE(new ArrayBuffer(size * ELEMENT_SIZE), HEADER_SIZE * ELEMENT_SIZE);
+    writeHeader(matrix, DIMENSION, columns);
+    if(values) {
+      for(var i = 0; i < rows; ++ i) {
+        var row = values[i];
+        if(row.length !== columns) {
+          throw new Error("invalid constructor invocation");
+        }
+        matrix.set(values[i], i * columns);
+      }
+    }
+
+    return matrix;
   }
 
   function Transform(dimensions) {
@@ -109,7 +133,7 @@
     if(1 === argc) {
       if(Array.isArray(arg) ||
          isTypedArray(arg)) {
-        // Argument is an initializer array
+        // Argument is an initializer
         var vector = new Matrix(arg.length, 1);
         vector.set(arg);
         return vector;
@@ -505,33 +529,6 @@
 
   }
 
-  function vector_toString(v) {
-    var size = v.length;
-    var result = "[";
-
-    for(var i = 0, l = size; i < l; ++ i) {
-      result += v[i];
-      if(i < l-1) {
-        result += ", ";
-      }
-    }
-    result += "]";
-
-    return result;
-  }
-
-  function vector_toMathML(v) {
-    var size = v.length;
-    var result = "<mfenced><mtable>";
-
-    for(var i = 0, l = size; i < l; ++ i) {
-      result += "<mtr><mtd><mn>" + v[i] + "</mn></mtd></mtr>";
-    }
-    result += "</mtable></mfenced>";
-
-    return result;
-  }
-
   function toMathML(a) {
     var size = a.length;   
     var columns = readHeader(a, DIMENSION);
@@ -549,6 +546,10 @@
     result += "</mtable></mfenced>";
 
     return result;
+  }
+
+  function toString(a) {
+
   }
 
   function vector_unit(offset, size, result) {
@@ -704,6 +705,7 @@
     clear: clear,
     scale: scale,
     toMathML: toMathML,
+    toString: toString,
     scalar: {
       clamp: scalar_clamp
     },
@@ -721,9 +723,7 @@
       direction: vector_direction,
       extract: vector_extract,
       zero: vector_uniform.bind(undefined, 0),
-      one: vector_uniform.bind(undefined, 1),
-      toString: vector_toString,
-      toMathML: vector_toMathML
+      one: vector_uniform.bind(undefined, 1)
     },
     vector2: {
       x: vector_unit.bind(undefined, 0, 2),
