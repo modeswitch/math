@@ -76,7 +76,7 @@
 
   function Matrix(arg0, arg1) {
     var argc = arguments.length;
-    var rows, columns, size, matrix, values;
+    var rows, columns, size, values;
     if(1 === argc) {
       // Argument is an array of values
       if(Array.isArray(arg0)) {
@@ -97,7 +97,8 @@
     // NOTE: Allocate an ArrayBuffer to hold a header and data, then create a view
     // for the data only. Internally, we will access the header directly from the buffer,
     // but this way the header stays out of the way for client code.
-    matrix = new ARRAY_TYPE(new ArrayBuffer(size * ELEMENT_SIZE), HEADER_SIZE * ELEMENT_SIZE);
+    var buffer = new ArrayBuffer(size * ELEMENT_SIZE);
+    var matrix = new ARRAY_TYPE(buffer, HEADER_SIZE * ELEMENT_SIZE);
     writeHeader(matrix, DIMENSION, columns);
     if(values) {
       for(var i = 0; i < rows; ++ i) {
@@ -112,15 +113,15 @@
     return matrix;
   }
 
-  function Transform(dimensions) {
+  function Transform(dimension) {
     var argc = arguments.length;
     if(1 === argc) {
       // Create an identity matrix large enough to hold an affine transform
-      ++ dimensions;
-      var transform = new Matrix(dimensions, dimensions);
+      ++ dimension;
+      var transform = new Matrix(dimension, dimension);
       writeHeader(transform, TYPE, TRANSFORM);
-      for(var i = 0, l = dimensions; i < l; ++ i) {
-        transform[i * dimensions + i] = 1;
+      for(var i = 0, l = dimension; i < l; ++ i) {
+        transform[i * dimension + i] = 1;
       }
       return transform;
     } else {
@@ -208,7 +209,8 @@
     e = (undefined !== e) ? e : 0.000001;
 
     // Scalar
-    if(!isNaN(a1) && !isNaN(a2)) {
+    if("number" === typeof a1 && 
+       "number" === typeof a2) {
       return Math.abs(a1 - a2) <= e;
     }
 
@@ -299,6 +301,31 @@
 
     for(var i = 0, l = size; i < l; ++ i) {
       result[i] = scalar;
+    }
+
+    return result;
+  }
+
+  function matrix_identity(arg) {
+    var dimension;
+    var result;
+    var i, l;
+    if(isTypedArray(arg)) {
+      dimension = readHeader(arg, DIMENSION);
+      if(arg.length/dimension !== dimension) {
+        throw new Error("matrix is not square");
+      }
+      result = arg;
+      for(i = 0, l = arg.length; i < l; ++ i) {
+        result[i] = 0;
+      }
+    } else {
+      dimension = arg;
+      result = new Matrix(dimension, dimension);
+    }
+
+    for(var i = 0; i < dimension; ++ i) {
+      result[i * dimension + i] = 1;
     }
 
     return result;
@@ -612,12 +639,14 @@
       throw new Error("matrix is not square");
     }
 
+    // TODO: implement algorithm for non-square matrices
+
     // FIXME: this is not a high-performance algorithm
-    for(var i = 0, l = size - 2; i < l; ++ i) {
-      for(var j = i+1, k = size - 1; j < k; ++ j) {
-        tmp = m[i, j];
-        m[i, j] = m[j, i];
-        m[j, i] = tmp;
+    for(var i = 0, l = dimension - 2; i <= l; ++ i) {
+      for(var j = i+1, k = dimension - 1; j <= k; ++ j) {
+        tmp = m[i * dimension + j];
+        m[i * dimension + j] = m[j * dimension + i];
+        m[j * dimension + i] = tmp;
       }
     }
   }
@@ -674,6 +703,101 @@
 
     return result;
   }
+
+  function matrix_inverse(m, result) {
+    var size = m.length;
+    var dimension = readHeader(m, DIMENSION);
+
+    if(size/dimension !== dimension) {
+      throw new Error("matrix is not square");
+    }
+
+    // TODO: implement inverse for NxN matrices
+
+    result = result || new Matrix(dimension, dimension);
+    var a00, a01, a02, a03,
+        a10, a11, a12, a13,
+        a20, a21, a22, a23,
+        a30, a31, a32, a33,
+
+        b00, b01, b02, b03,
+        b04, b05, b06, b07,
+        b08, b09, b10, b11;
+    var determinant, inverseDeterminant;
+
+    if(3 === dimension) {
+      a00 = m[0]; a01 = m[1]; a02 = m[2];
+      a10 = m[3]; a11 = m[4]; a12 = m[5];
+      a20 = m[6]; a21 = m[7]; a22 = m[8];
+
+      b00 = a22 * a11 - a12 * a21;
+      b01 = -a22 * a10 + a12 * a20;
+      b02 = a21 * a10 - a11 * a20;
+
+      determinant = a00 * b00 + a01 * b01 + a02 * b02;
+      if(!determinant) {
+        throw new Error("matrix is not invertible");
+      }
+      inverseDeterminant = 1/determinant;
+
+      result[0] = b00 * inverseDeterminant;
+      result[1] = (-a22 * a01 + a02 * a21) * inverseDeterminant;
+      result[2] = (a12 * a01 - a02 * a11) * inverseDeterminant;
+      result[3] = b01 * inverseDeterminant;
+      result[4] = (a22 * a00 - a02 * a20) * inverseDeterminant;
+      result[5] = (-a12 * a00 + a02 * a10) * inverseDeterminant;
+      result[6] = b02 * inverseDeterminant;
+      result[7] = (-a21 * a00 + a01 * a20) * inverseDeterminant;
+      result[8] = (a11 * a00 - a01 * a10) * inverseDeterminant;
+    } else if(4 === dimension) {
+      a00 = m[0]; a01 = m[1]; a02 = m[2]; a03 = m[3];
+      a10 = m[4]; a11 = m[5]; a12 = m[6]; a13 = m[7];
+      a20 = m[8]; a21 = m[9]; a22 = m[10]; a23 = m[11];
+      a30 = m[12]; a31 = m[13]; a32 = m[14]; a33 = m[15];
+
+      b00 = a00 * a11 - a01 * a10;
+      b01 = a00 * a12 - a02 * a10;
+      b02 = a00 * a13 - a03 * a10;
+      b03 = a01 * a12 - a02 * a11;
+      b04 = a01 * a13 - a03 * a11;
+      b05 = a02 * a13 - a03 * a12;
+      b06 = a20 * a31 - a21 * a30;
+      b07 = a20 * a32 - a22 * a30;
+      b08 = a20 * a33 - a23 * a30;
+      b09 = a21 * a32 - a22 * a31;
+      b10 = a21 * a33 - a23 * a31;
+      b11 = a22 * a33 - a23 * a32;
+
+      determinant = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
+      if(!determinant) {
+        throw new Error("matrix is not invertible");
+      }
+      inverseDeterminant = 1/determinant;
+
+      result[0] = (a11 * b11 - a12 * b10 + a13 * b09) * inverseDeterminant;
+      result[1] = (-a01 * b11 + a02 * b10 - a03 * b09) * inverseDeterminant;
+      result[2] = (a31 * b05 - a32 * b04 + a33 * b03) * inverseDeterminant;
+      result[3] = (-a21 * b05 + a22 * b04 - a23 * b03) * inverseDeterminant;
+      result[4] = (-a10 * b11 + a12 * b08 - a13 * b07) * inverseDeterminant;
+      result[5] = (a00 * b11 - a02 * b08 + a03 * b07) * inverseDeterminant;
+      result[6] = (-a30 * b05 + a32 * b02 - a33 * b01) * inverseDeterminant;
+      result[7] = (a20 * b05 - a22 * b02 + a23 * b01) * inverseDeterminant;
+      result[8] = (a10 * b10 - a11 * b08 + a13 * b06) * inverseDeterminant;
+      result[9] = (-a00 * b10 + a01 * b08 - a03 * b06) * inverseDeterminant;
+      result[10] = (a30 * b04 - a31 * b02 + a33 * b00) * inverseDeterminant;
+      result[11] = (-a20 * b04 + a21 * b02 - a23 * b00) * inverseDeterminant;
+      result[12] = (-a10 * b09 + a11 * b07 - a12 * b06) * inverseDeterminant;
+      result[13] = (a00 * b09 - a01 * b07 + a02 * b06) * inverseDeterminant;
+      result[14] = (-a30 * b03 + a31 * b01 - a32 * b00) * inverseDeterminant;
+      result[15] = (a20 * b03 - a21 * b01 + a22 * b00) * inverseDeterminant;
+    } else {
+      throw new Error("matrix must have dimension 3 or 4");
+    }
+
+    return result;
+  }
+
+
 
   var api = {
     // Configuration
@@ -750,23 +874,18 @@
       conjugate: quaternion_conjugate,
       slerp: undefined,
       // Quaternion of rotation between two vectors
-      rotation: undefined, 
+      rotation: undefined,
       // Convert between quaternion and axis-angle
       toAxisAngle: undefined,
       fromAxisAngle: undefined
     },
     matrix: {      
       multiply: matrix_multiply,
-      inverse: undefined,
-      transpose: matrix_transpose,
-      determinant: undefined,
+      inverse: matrix_inverse,
+      transpose: matrix_transpose,  // Square matrix only!
       set: undefined,
       get: undefined,
-      extract: undefined,
-      insert: undefined,
-      identity: undefined,
-      toString: undefined,
-      toMathML: undefined
+      identity: matrix_identity
     },
     matrix2: {
       // Convert between rotation matrix and angle
@@ -783,11 +902,8 @@
     },
     transform: {
       translate: undefined,
-      pretranslate: undefined,
       rotate: undefined,
-      prerotate: undefined,
       scale: undefined,
-      prescale: undefined,
       // Singular value decomposition
       svd: undefined,
       // Extract the linear part of the transform
