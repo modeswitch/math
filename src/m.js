@@ -337,7 +337,7 @@
       result = new Matrix(dimension, dimension);
     }
 
-    for(var i = 0; i < dimension; ++ i) {
+    for(i = 0; i < dimension; ++ i) {
       result[i * dimension + i] = 1;
     }
 
@@ -385,7 +385,7 @@
     // TODO: optimize for size 2, 3, 4
 
     for(var i = 0, l = size; i < l; ++ i) {
-      result += v[i] * v[i];
+      result += v1[i] * v2[i];
     }
 
     return result;
@@ -429,15 +429,15 @@
   function clone(a, result) {
     var size = a.length;
     var dimension = readHeader(a, DIMENSION);
-    var clone = result || new Matrix(size/dimension, size);
+    result = result || new Matrix(size/dimension, size);
 
     // TODO: optimize for size 2, 3, 4, 9, 16
 
     for(var i = 0, l = size; i < l; ++ i) {
-      clone[i] = a[i];
+      result[i] = a[i];
     }
 
-    return clone;
+    return result;
   }
 
   function vector_normalize(v, result) {
@@ -448,13 +448,13 @@
 
     // TODO: optimize for size 2, 3, 4
 
-    for(i = 0, l = size; i < l; ++ i) {
+    for(i = 0; i < size; ++ i) {
       length += v[i] * v[i];
     }
 
     length = sqrt(length);
 
-    for(i = 0, l = size; i < l; ++ i) {
+    for(i = 0; i < size; ++ i) {
       result[i] = result[i]/length;
     }
 
@@ -529,14 +529,14 @@
     // TODO: optimize for size 2, 3, 4
 
     var i;
-    for(i = 0, l = size; i < l; ++ i) {
+    for(i = 0; i < size; ++ i) {
       result[i] = v2[i] - v1[i];
       length += result[i] * result[i];
     }
 
     length = 1/sqrt(length);
 
-    for(i = 0, l = size; i < l; ++ i) {
+    for(i = 0; i < size; ++ i) {
       result[i] = result[i] * length;
     }
 
@@ -822,10 +822,10 @@
         ratioB;
 
     if (abs(cosHalfTheta) >= 1.0) {
-      result[0] = q[0];
-      result[1] = q[1];
-      result[2] = q[2];
-      result[3] = q[3];
+      result[0] = q1[0];
+      result[1] = q1[1];
+      result[2] = q1[2];
+      result[3] = q1[3];
       return result;
     }
 
@@ -857,7 +857,7 @@
 
     var halfAngle = vector_length(aa)/2;
     var axis = vector_normalize(aa, quaternion_fromAxisAngle_TMP_V3);
-    var sinHalfAngle = sin(angle/2);
+    var sinHalfAngle = sin(halfAngle);
 
     result[0] = axis[0] * sinHalfAngle;
     result[1] = axis[1] * sinHalfAngle;
@@ -868,7 +868,7 @@
   }
 
   function quaternion_toAxisAngle(q, result) {
-    result = result || new Vector3();
+    result = result || new Vector(3);
 
     var w = q[3];
     var angle = 2 * acos(w);
@@ -932,7 +932,7 @@
   }
 
   function radians_toString(s) {
-    s = s/M.TAU;
+    s = s/TAU;
     var f = scalar_fraction(s);
     var result = f;
     if("0" !== f) {
