@@ -5,8 +5,8 @@ module.exports = function() {
   var callback = function() {
   };
   var opts = {
-      stdout: true,
-      stderr: true,
+      printStdout: true,
+      printStderr: true,
       breakOnError: false
   };
 

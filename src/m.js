@@ -904,11 +904,6 @@
     return atan2(m[2], m[0]);
   }
 
-  var quaternion_rotation_TMP0 = new Vector(3);
-  function quaternion_rotation(v1, v2, result) {
-    result = result || new Quaternion();
-  }
-
   function scalar_fraction(d) {
     var e = 100000;
     d = round(d*e)/e;
