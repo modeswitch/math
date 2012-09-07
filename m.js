@@ -1,5 +1,19 @@
-;(function(window, undefined) {
+;(function(window, Math, undefined) {
   'use strict';
+
+  var sin = Math.sin;
+  var cos = Math.cos;
+  var acos = Math.acos;
+  var sqrt = Math.sqrt;
+  var abs = Math.abs;
+  var atan = Math.atan;
+  var atan2 = Math.atan2;
+  var floor = Math.floor;
+  var round = Math.round;
+  var PI = Math.PI;
+  var TAU = 2*Math.PI;
+
+  var TAU_SYMBOL = "t";
 
   /** Detect free variable `exports` */
   var freeExports = typeof exports == 'object' && exports &&
@@ -65,7 +79,6 @@
 
   // Temporary storage
   var TMP0 = new Float32Array(16);
-  var TMP1 = new Float32Array(16);
 
   /*
    * Constructors
@@ -150,7 +163,7 @@
   function Quaternion() {
     var argc = arguments.length;
     if(0 === argc) {
-      return new Vector(0, 0, 0, 1);
+      return new Vector(4);
     } else if(4 === argc) {
       // Components
       return new Vector(arguments[0], arguments[1], arguments[2], arguments[3]);
@@ -211,7 +224,7 @@
     // Scalar
     if("number" === typeof a1 && 
        "number" === typeof a2) {
-      return Math.abs(a1 - a2) <= e;
+      return abs(a1 - a2) <= e;
     }
 
     // Check dimensions
@@ -227,7 +240,7 @@
     }
     
     for(var i = 0, l = size; i < l; ++ i) {
-      if(Math.abs(a1[i] - a2[i]) > e) {
+      if(abs(a1[i] - a2[i]) > e) {
         return false;
       }
     }
@@ -245,7 +258,7 @@
       result += v[i] * v[i];
     }
 
-    return Math.sqrt(result);
+    return sqrt(result);
   }
 
   function vector_length2(v) {
@@ -339,6 +352,7 @@
       result[3] = 1;
     } else {
       result = new Quaternion();
+      result[0] = 1;
     }
 
     return result;
@@ -400,7 +414,7 @@
       if(v[i] === 0) {
         continue;
       }
-      var scale = Math.abs(v[i]);
+      var scale = abs(v[i]);
       var sign = v[i] > 0 ? 1 : -1;
       if(scale > limit) {
         result[i] = sign * limit;
@@ -438,7 +452,7 @@
       length += v[i] * v[i];
     }
 
-    length = Math.sqrt(length);
+    length = sqrt(length);
 
     for(i = 0, l = size; i < l; ++ i) {
       result[i] = result[i]/length;
@@ -462,7 +476,7 @@
       r += d * d;
     }
 
-    return Math.sqrt(r);
+    return sqrt(r);
   }
 
   function vector_angle(v1, v2) {
@@ -478,7 +492,7 @@
       result += v1[i] * v2[i];
     }
 
-    return Math.acos(result);
+    return acos(result);
   }
 
   function vector_lerp(v1, v2, s, result) {
@@ -520,7 +534,7 @@
       length += result[i] * result[i];
     }
 
-    length = 1/Math.sqrt(length);
+    length = 1/sqrt(length);
 
     for(i = 0, l = size; i < l; ++ i) {
       result[i] = result[i] * length;
@@ -797,7 +811,223 @@
     return result;
   }
 
+  // https://github.com/toji/gl-matrix/blob/master/gl-matrix.js#L2371
+  function quaternion_slerp(q1, q2, slerp, result) {
+    result = result || new Quaternion();
 
+    var cosHalfTheta = q1[0] * q2[0] + q1[1] * q2[1] + q1[2] * q2[2] + q1[3] * q2[3],
+        halfTheta,
+        sinHalfTheta,
+        ratioA,
+        ratioB;
+
+    if (abs(cosHalfTheta) >= 1.0) {
+      result[0] = q[0];
+      result[1] = q[1];
+      result[2] = q[2];
+      result[3] = q[3];
+      return result;
+    }
+
+    halfTheta = acos(cosHalfTheta);
+    sinHalfTheta = sqrt(1.0 - cosHalfTheta * cosHalfTheta);
+
+    if (abs(sinHalfTheta) < 0.001) {
+        result[0] = (q1[0] * 0.5 + q2[0] * 0.5);
+        result[1] = (q1[1] * 0.5 + q2[1] * 0.5);
+        result[2] = (q1[2] * 0.5 + q2[2] * 0.5);
+        result[3] = (q1[3] * 0.5 + q2[3] * 0.5);
+        return result;
+    }
+
+    ratioA = sin((1 - slerp) * halfTheta) / sinHalfTheta;
+    ratioB = sin(slerp * halfTheta) / sinHalfTheta;
+
+    result[0] = (q1[0] * ratioA + q2[0] * ratioB);
+    result[1] = (q1[1] * ratioA + q2[1] * ratioB);
+    result[2] = (q1[2] * ratioA + q2[2] * ratioB);
+    result[3] = (q1[3] * ratioA + q2[3] * ratioB);
+
+    return result;
+  }
+
+  var quaternion_fromAxisAngle_TMP_V3 = new Vector(3);
+  function quaternion_fromAxisAngle(aa, result) {
+    result = result || new Quaternion();
+
+    var halfAngle = vector_length(aa)/2;
+    var axis = vector_normalize(aa, quaternion_fromAxisAngle_TMP_V3);
+    var sinHalfAngle = sin(angle/2);
+
+    result[0] = axis[0] * sinHalfAngle;
+    result[1] = axis[1] * sinHalfAngle;
+    result[2] = axis[2] * sinHalfAngle;
+    result[3] = cos(halfAngle);
+
+    return result;
+  }
+
+  function quaternion_toAxisAngle(q, result) {
+    result = result || new Vector3();
+
+    var w = q[3];
+    var angle = 2 * acos(w);
+    var coeff = sqrt(1-w*w);
+
+    if(0 === coeff) {
+      vector_unit(2, 3, result);
+      return result;
+    } else {
+      coeff = 1/coeff;
+
+      result[0] = q[0] * coeff;
+      result[1] = q[1] * coeff;
+      result[2] = q[2] * coeff;
+
+      return result;
+    }
+  }
+
+  function matrix2_fromAngle(angle, result) {
+    result = result || new Matrix(2, 2);
+
+    result[0] = cos(angle);
+    result[1] = -sin(angle);
+    result[2] = sin(angle);
+    result[3] = cos(angle);
+
+    return result;
+  }
+
+  function matrix2_toAngle(m) {
+    //return atan(m[2]/m[3]);
+    return atan2(m[2], m[0]);
+  }
+
+  var quaternion_rotation_TMP0 = new Vector(3);
+  function quaternion_rotation(v1, v2, result) {
+    result = result || new Quaternion();
+  }
+
+  function scalar_fraction(d) {
+    var e = 100000;
+    d = round(d*e)/e;
+    if(0 === d) {
+      return "0";
+    }
+    var df = 1, top = 1, bot = 1;
+    var limit = 1e5; //Increase the limit to get more precision.
+ 
+    while (df != d && limit-- > 0) {
+        if (df < d) {
+            top += 1;
+        }
+        else {
+            bot += 1;
+            top = parseInt(d * bot, 10);
+        }
+        df = top / bot;
+    }
+    return top + '/' + bot;
+  }
+
+  function radians_toString(s) {
+    s = s/M.TAU;
+    var f = scalar_fraction(s);
+    var result = f;
+    if("0" !== f) {
+      result += TAU_SYMBOL;
+    }
+    return result;
+  }
+
+  function matrix_extract(m, rowOffset, columnOffset, rows, columns, result) {
+
+  }
+
+  var transform_translate_TMP_T2 = new Transform(2);
+  var transform_translate_TMP_T3 = new Transform(3);
+  function transform_translate(a, b, result) {
+    var transform;
+    var translation;
+    var first, second;
+
+    if(TRANSFORM === readHeader(a, TYPE)) {
+      transform = first = a;
+      translation = b;
+    } else if(TRANSFORM === readHeader(b, TYPE)) {
+      transform = second = b;
+      translation = a;
+    }
+
+    var transformDimension = readHeader(transform, DIMENSION) - 1;
+    result = result || new Transform(transformDimension+1);
+
+    if(TRANSFORM === readHeader(translation, TYPE)) {
+      matrix_multiply(a, b, result);
+      return result;
+    }
+
+    var TMP;
+    if(3 === transformDimension) {
+      TMP = transform_translate_TMP_T3;
+      matrix_identity(TMP);
+      TMP[3] = translation[0];
+      TMP[7] = translation[1];
+      TMP[11] = translation[2];
+    } else if(2 === transformDimension) {
+      TMP = transform_translate_TMP_T2;
+      matrix_identity(TMP);
+      TMP[2] = translation[0];
+      TMP[5] = translation[1];
+    }
+
+    result = result || new Transform(transformDimension+1);
+    if(first) {
+      second = TMP;
+    } else {
+      first = TMP;
+    }
+    matrix_multiply(first, second, result);
+    return result;
+  }
+
+  function matrix3_fromQuaternion(q, result) {
+    result = result || new Matrix(3, 3);
+
+    var x = q[0], y = q[1], z = q[2], w = q[3];
+    var xx = x*x, yy = y*y, zz = z*z;
+
+    result[0] = 1 - 2*yy - 2*zz;
+    result[1] = 2*x*y - 2*z*w;
+    result[2] = 2*x*z + 2*y*w;
+
+    result[3] = 2*x*y + 2*z*w;
+    result[4] = 1 - 2*xx - 2*zz;
+    result[5] = 2*y*z - 2*x*w;
+
+    result[6] = 2*x*z - 2*y*w;
+    result[7] = 2*y*z + 2*x*w;
+    result[8] = 1 - 2*xx - 2*yy;
+
+    return result;
+  }
+
+  var matrix3_fromAxisAngle_TMP_V3 = new Vector(3);
+  function matrix3_fromAxisAngle(aa, result) {
+    result = result || new Matrix(3, 3);
+
+    var angle = vector_length(aa);
+    var axis = 
+  }
+
+  // Internal vector constants
+  var X2 = vector_unit(0, 2);
+  var Y2 = vector_unit(1, 2);
+
+  var X3 = vector_unit(0, 3);
+  var Y3 = vector_unit(1, 3);
+  var Z3 = vector_unit(2, 3);
 
   var api = {
     // Configuration
@@ -818,8 +1048,8 @@
     LookAt: undefined,      
 
     // Constants
-    PI: Math.PI,   
-    TAU: Math.PI * 2,
+    PI: PI,   
+    TAU: TAU,
     
     // Operators
     clone: clone,
@@ -831,7 +1061,13 @@
     toMathML: toMathML,
     toString: toString,
     scalar: {
-      clamp: scalar_clamp
+      clamp: scalar_clamp,
+      fraction: scalar_fraction
+    },
+    radians: {
+      toString: radians_toString,
+      fromDegrees: undefined,
+      toDegrees: undefined
     },
     vector: {
       length: vector_length,
@@ -872,36 +1108,35 @@
       identity: quaternion_identity,
       inverse: quaternion_inverse,
       conjugate: quaternion_conjugate,
-      slerp: undefined,
+      slerp: quaternion_slerp,
       // Quaternion of rotation between two vectors
       rotation: undefined,
       // Convert between quaternion and axis-angle
-      toAxisAngle: undefined,
-      fromAxisAngle: undefined
+      toAxisAngle: quaternion_toAxisAngle,
+      fromAxisAngle: quaternion_fromAxisAngle
     },
     matrix: {      
       multiply: matrix_multiply,
       inverse: matrix_inverse,
       transpose: matrix_transpose,  // Square matrix only!
-      set: undefined,
-      get: undefined,
-      identity: matrix_identity
+      identity: matrix_identity,
+      extract: matrix_extract
     },
     matrix2: {
       // Convert between rotation matrix and angle
-      toAngle: undefined,
-      fromAngle: undefined
+      toAngle: matrix2_toAngle,
+      fromAngle: matrix2_fromAngle
     },
     matrix3: {
       // Convert between rotation matrix and quaternion
       toQuaternion: undefined,
-      fromQuaternion: undefined,
+      fromQuaternion: matrix3_fromQuaternion,
       // Convert between rotation matrix and axis-angle
       toAxisAngle: undefined,
       fromAxisAngle: undefined
     },
     transform: {
-      translate: undefined,
+      translate: transform_translate,
       rotate: undefined,
       scale: undefined,
       // Singular value decomposition
@@ -943,4 +1178,4 @@
     // in a browser or Rhino
     window.M = api;
   }
-}(this));
+}(this, Math));
