@@ -812,7 +812,7 @@
   }
 
   // https://github.com/toji/gl-matrix/blob/master/gl-matrix.js#L2371
-  function quaternion_slerp(q1, q2, slerp, result) {
+  function quaternion_slerp(q1, q2, s, result) {
     result = result || new Quaternion();
 
     var cosHalfTheta = q1[0] * q2[0] + q1[1] * q2[1] + q1[2] * q2[2] + q1[3] * q2[3],
@@ -840,8 +840,8 @@
         return result;
     }
 
-    ratioA = sin((1 - slerp) * halfTheta) / sinHalfTheta;
-    ratioB = sin(slerp * halfTheta) / sinHalfTheta;
+    ratioA = sin((1 - s) * halfTheta) / sinHalfTheta;
+    ratioB = sin(s * halfTheta) / sinHalfTheta;
 
     result[0] = (q1[0] * ratioA + q2[0] * ratioB);
     result[1] = (q1[1] * ratioA + q2[1] * ratioB);
