@@ -1018,7 +1018,6 @@
     result = result || new Matrix(3, 3);
 
     var angle = vector_length(aa);
-    var axis = 
   }
 
   // Internal vector constants
