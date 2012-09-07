@@ -2,6 +2,11 @@
   "browser": true,  // allow common browser globals
 
   "predef": [       // extra globals to ignore
+
+    "global",
+
+    // node
+    "exports",
   
     // require.js
     "require",

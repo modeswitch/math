@@ -16,8 +16,8 @@
   var TAU_SYMBOL = "t";
 
   /** Detect free variable `exports` */
-  var freeExports = typeof exports == 'object' && exports &&
-    (typeof global == 'object' && global && global == global.global && (window = global), exports);
+  var freeExports = (typeof exports == 'object') && exports &&
+    (typeof global == 'object' && global && global == global.global && (window = global)) ? exports : undefined;
 
   function nop() {}
 
