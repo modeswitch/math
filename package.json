@@ -1,0 +1,11 @@
+{
+  "name": "mathjs",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "test": "jshint . && NODE_PATH=$NODE_PATH:. jasmine-node --test-dir tests"
+  },
+  "engines": {
+    "node": "0.8.x"
+  }
+}
