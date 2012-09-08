@@ -7,5 +7,9 @@
   },
   "engines": {
     "node": "0.8.x"
+  },
+  "dependencies": {
+    "jasmine-node": "~1.0.26",
+    "jshint": "~0.9.0"
   }
 }
