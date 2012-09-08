@@ -10,9 +10,8 @@ task( "default", [], require( "./tools/jake-tasks/default" ) );
 desc( "lint code" );
 task( "lint", [], require( "./tools/jake-tasks/lint" ) );
 
-directory( "dist" );
-desc( "compile code" );
-task( "build", ["clean", "dist"], require( "./tools/jake-tasks/build" ) );
+desc( "compile code and documentation" );
+task( "build", ["src/m.js"], require( "./tools/jake-tasks/build" ) );
 
 desc( "remove compiled code" );
 task( "clean", [], require( "./tools/jake-tasks/clean" ) );
