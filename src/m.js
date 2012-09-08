@@ -1024,9 +1024,6 @@
   var Z3 = vector_unit(2, 3);
 
   var api = {
-    // Configuration
-    debug: false,
-
     // Utility functions
     isTypedArray: isTypedArray,
     arrayType: arrayType,
