@@ -1175,15 +1175,10 @@
     scale: scale,
     toMathML: toMathML,
     toString: toString,
-    scalar: {
-      clamp: scalar_clamp,
-      fraction: scalar_fraction
-    },
-    radians: {
-      toString: radians_toString,
-      fromDegrees: undefined,
-      toDegrees: undefined
-    },
+    clamp: scalar_clamp,
+    // fraction: scalar_fraction,
+    toDegrees: undefined,
+    toRadians: undefined,
     vector: {
       length: vector_length,
       length2: vector_length2,

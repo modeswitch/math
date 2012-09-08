@@ -51,6 +51,13 @@ Operations
 
   Clears a buffer by writing a scalar into each component.
 
+.. js:function:: clamp(s, min, max)
+
+  :param number s: scalar
+  :param number min: minimum value
+  :param number max: maximum value
+  :returns: ``s`` restricted inside range of ``min`` to ``max``
+
 .. js:function:: toMathML(a)
 
   :param Matrix a: buffer
