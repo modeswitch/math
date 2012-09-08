@@ -958,30 +958,129 @@
     var transformDimension = readHeader(transform, DIMENSION) - 1;
     result = result || new Transform(transformDimension+1);
 
-    if(TRANSFORM === readHeader(translation, TYPE)) {
-      matrix_multiply(a, b, result);
-      return result;
-    }
-
-    var TMP;
+    var tT;
     if(3 === transformDimension) {
-      TMP = transform_translate_TMP_T3;
-      matrix_identity(TMP);
-      TMP[3] = translation[0];
-      TMP[7] = translation[1];
-      TMP[11] = translation[2];
+      tT = matrix_identity(transform_translate_TMP_T3);
+      tT[3] = translation[0];
+      tT[7] = translation[1];
+      tT[11] = translation[2];
     } else if(2 === transformDimension) {
-      TMP = transform_translate_TMP_T2;
-      matrix_identity(TMP);
-      TMP[2] = translation[0];
-      TMP[5] = translation[1];
+      tT = matrix_identity(transform_translate_TMP_T2);
+      tT[2] = translation[0];
+      tT[5] = translation[1];
     }
 
-    result = result || new Transform(transformDimension+1);
     if(first) {
-      second = TMP;
+      second = tT;
     } else {
-      first = TMP;
+      first = tT;
+    }
+    matrix_multiply(first, second, result);
+    return result;
+  }
+
+  var transform_rotate_TMP_T2 = new Transform(2);
+  var transform_rotate_TMP_M2 = new Matrix(2, 2);
+  var transform_rotate_TMP_T3 = new Transform(3);
+  var transform_rotate_TMP_M3 = new Matrix(3, 3);
+  function transform_rotate(a, b, result) {
+    var transform;
+    var rotation;
+    var first, second;
+
+    if(typeof b === "number" || TRANSFORM === readHeader(a, TYPE)) {
+      transform = first = a;
+      rotation = b;
+    } else if(typeof a === "number" || TRANSFORM === readHeader(b, TYPE)) {
+      transform = second = b;
+      rotation = a;
+    }
+
+    var transformDimension = readHeader(transform, DIMENSION) - 1;
+    result = result || new Transform(transformDimension+1);
+
+    var rT, rM, length;
+    length = (typeof rotation === "number") ? 1 : rotation.length;
+    if(3 === transformDimension) {
+      if(3 === length) {
+        rM = matrix3_fromAxisAngle(rotation, transform_rotate_TMP_M3);
+      } else if(4 === length) {
+        rM = matrix3_fromQuaternion(rotation, transform_rotate_TMP_M3);
+      } else {
+        // Assume we have a 3D rotation matrix
+        rM = rotation;
+      }
+      rT = matrix_identity(transform_rotate_TMP_T3);
+
+      rT[0] = rM[0];
+      rT[1] = rM[1];
+      rT[2] = rM[2];
+
+      rT[4] = rM[3];
+      rT[5] = rM[4];
+      rT[6] = rM[5];
+
+      rT[8] = rM[6];
+      rT[9] = rM[7];
+      rT[10] = rM[8];
+    } else if(2 === transformDimension) {
+      if(1 === length) {
+        rM = matrix2_fromAngle(rotation, transform_rotate_TMP_M2);
+      } else {
+        // Assume we have a 2D rotation matrix
+        rM = rotation;
+      }
+      rT = matrix_identity(transform_rotate_TMP_T2);
+
+      rT[0] = rM[0];
+      rT[1] = rM[1];
+      rT[4] = rM[2];
+      rT[5] = rM[3];
+    }
+
+    if(first) {
+      second = rT;
+    } else {
+      first = rT;
+    }
+    matrix_multiply(first, second, result);
+    return result;
+  }
+
+  var transform_scale_TMP_T2 = new Transform(2);
+  var transform_scale_TMP_T3 = new Transform(3);
+  function transform_scale(a, b, result) {
+    var transform;
+    var scaling;
+    var first, second;
+
+    if(TRANSFORM === readHeader(a, TYPE)) {
+      transform = first = a;
+      scaling = b;
+    } else if(TRANSFORM === readHeader(b, TYPE)) {
+      transform = second = b;
+      scaling = a;
+    }
+
+    var transformDimension = readHeader(transform, DIMENSION) - 1;
+    result = result || new Transform(transformDimension+1);
+
+    var sT;
+    if(3 === transformDimension) {
+      sT = matrix_identity(transform_translate_TMP_T3);
+      sT[0] = scaling[0];
+      sT[5] = scaling[1];
+      sT[10] = scaling[2];
+    } else if(2 === transformDimension) {
+      sT = matrix_identity(transform_translate_TMP_T3);
+      sT[0] = scaling[0];
+      sT[4] = scaling[1];
+    }
+
+    if(first) {
+      second = sT;
+    } else {
+      first = sT;
     }
     matrix_multiply(first, second, result);
     return result;
@@ -1013,6 +1112,31 @@
     result = result || new Matrix(3, 3);
 
     var angle = vector_length(aa);
+    var axis = vector_normalize(aa, matrix3_fromAxisAngle_TMP_V3);
+
+    var c = cos(angle);
+    var s = sin(angle);
+    var x = axis[0];
+    var y = axis[1];
+    var z = axis[2];
+    var xx = x*x;
+    var yy = y*y;
+    var zz = z*z;
+    var t = 1-c;
+
+    result[0] = t*xx + c;
+    result[1] = t*x*y - z*s;
+    result[2] = t*x*z + y*z;
+
+    result[3] = t*x*y + z*s;
+    result[4] = t*yy + c;
+    result[5] = t*y*z - x*z;
+
+    result[6] = t*x*z - y*s;
+    result[7] = t*y*z + x*s;
+    result[8] = t*zz + c;
+
+    return result;
   }
 
   // Internal vector constants
@@ -1051,15 +1175,10 @@
     scale: scale,
     toMathML: toMathML,
     toString: toString,
-    scalar: {
-      clamp: scalar_clamp,
-      fraction: scalar_fraction
-    },
-    radians: {
-      toString: radians_toString,
-      fromDegrees: undefined,
-      toDegrees: undefined
-    },
+    clamp: scalar_clamp,
+    // fraction: scalar_fraction,
+    toDegrees: undefined,
+    toRadians: undefined,
     vector: {
       length: vector_length,
       length2: vector_length2,
@@ -1124,12 +1243,12 @@
       fromQuaternion: matrix3_fromQuaternion,
       // Convert between rotation matrix and axis-angle
       toAxisAngle: undefined,
-      fromAxisAngle: undefined
+      fromAxisAngle: matrix3_fromAxisAngle
     },
     transform: {
       translate: transform_translate,
-      rotate: undefined,
-      scale: undefined,
+      rotate: transform_rotate,
+      scale: transform_scale,
       // Singular value decomposition
       svd: undefined,
       // Extract the linear part of the transform
