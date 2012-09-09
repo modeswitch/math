@@ -340,7 +340,7 @@ Quaternion
 Matrix
 ------
 
-.. js:function:: multiply(m1, m2[, reuslt])
+.. js:function:: multiply(m1, m2[, result])
 
   :param Matrix m1: first matrix
   :param Matrix m2: second matrix
@@ -390,6 +390,15 @@ Matrix
 Matrix2
 -------
 
+.. js:function:: multiply(m1, m2[, result])
+
+  .. note:: Optimized
+
+  :param Matrix m1: first square matrix
+  :param Matrix m2: second square matrix
+  :param Matrix result: result
+  :returns: the matrix product of ``m1`` with ``m2``
+
 .. js:function:: toAngle(m)
 
   :param Matrix m: rotation matrix
@@ -403,6 +412,15 @@ Matrix2
 
 Matrix3
 -------
+
+.. js:function:: multiply(m1, m2[, result])
+
+  .. note:: Optimized
+
+  :param Matrix m1: first square matrix
+  :param Matrix m2: second square matrix
+  :param Matrix result: result
+  :returns: the matrix product of ``m1`` with ``m2``
 
 .. js:function:: toQuaternion(m[, result])
 
@@ -435,6 +453,18 @@ Matrix3
   :param Vector v: axis-angle vector
   :param Matrix result: result
   :returns: rotation matrix
+
+Matrix4
+-------
+
+.. js:function:: multiply(m1, m2[, result])
+
+  .. note:: Optimized
+
+  :param Matrix m1: first square matrix
+  :param Matrix m2: second square matrix
+  :param Matrix result: result
+  :returns: the matrix product of ``m1`` with ``m2``  
 
 Transform
 ---------

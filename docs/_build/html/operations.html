@@ -1095,7 +1095,7 @@
 <h2>Matrix<a class="headerlink" href="#matrix" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="multiply">
-<tt class="descname">multiply</tt><big>(</big><em>m1</em>, <em>m2</em><span class="optional">[</span>, <em>reuslt</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#multiply" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">multiply</tt><big>(</big><em>m1</em>, <em>m2</em><span class="optional">[</span>, <em>result</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#multiply" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1236,6 +1236,31 @@
 <div class="section" id="matrix2">
 <h2>Matrix2<a class="headerlink" href="#matrix2" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
+<dt>
+<tt class="descname">multiply</tt><big>(</big><em>m1</em>, <em>m2</em><span class="optional">[</span>, <em>result</em><span class="optional">]</span><big>)</big></dt>
+<dd><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Optimized</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>m1</strong> (<a class="reference internal" href="types.html#Matrix" title="Matrix"><em>Matrix</em></a>) &#8211; first square matrix</li>
+<li><strong>m2</strong> (<a class="reference internal" href="types.html#Matrix" title="Matrix"><em>Matrix</em></a>) &#8211; second square matrix</li>
+<li><strong>result</strong> (<a class="reference internal" href="types.html#Matrix" title="Matrix"><em>Matrix</em></a>) &#8211; result</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the matrix product of <tt class="docutils literal"><span class="pre">m1</span></tt> with <tt class="docutils literal"><span class="pre">m2</span></tt></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="toAngle">
 <tt class="descname">toAngle</tt><big>(</big><em>m</em><big>)</big><a class="headerlink" href="#toAngle" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
@@ -1277,6 +1302,31 @@
 </div>
 <div class="section" id="matrix3">
 <h2>Matrix3<a class="headerlink" href="#matrix3" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt>
+<tt class="descname">multiply</tt><big>(</big><em>m1</em>, <em>m2</em><span class="optional">[</span>, <em>result</em><span class="optional">]</span><big>)</big></dt>
+<dd><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Optimized</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>m1</strong> (<a class="reference internal" href="types.html#Matrix" title="Matrix"><em>Matrix</em></a>) &#8211; first square matrix</li>
+<li><strong>m2</strong> (<a class="reference internal" href="types.html#Matrix" title="Matrix"><em>Matrix</em></a>) &#8211; second square matrix</li>
+<li><strong>result</strong> (<a class="reference internal" href="types.html#Matrix" title="Matrix"><em>Matrix</em></a>) &#8211; result</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the matrix product of <tt class="docutils literal"><span class="pre">m1</span></tt> with <tt class="docutils literal"><span class="pre">m2</span></tt></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="function">
 <dt id="toQuaternion">
 <tt class="descname">toQuaternion</tt><big>(</big><em>m</em><span class="optional">[</span>, <em>result</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#toQuaternion" title="Permalink to this definition">¶</a></dt>
@@ -1367,6 +1417,34 @@
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">rotation matrix</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="matrix4">
+<h2>Matrix4<a class="headerlink" href="#matrix4" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt>
+<tt class="descname">multiply</tt><big>(</big><em>m1</em>, <em>m2</em><span class="optional">[</span>, <em>result</em><span class="optional">]</span><big>)</big></dt>
+<dd><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Optimized</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>m1</strong> (<a class="reference internal" href="types.html#Matrix" title="Matrix"><em>Matrix</em></a>) &#8211; first square matrix</li>
+<li><strong>m2</strong> (<a class="reference internal" href="types.html#Matrix" title="Matrix"><em>Matrix</em></a>) &#8211; second square matrix</li>
+<li><strong>result</strong> (<a class="reference internal" href="types.html#Matrix" title="Matrix"><em>Matrix</em></a>) &#8211; result</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the matrix product of <tt class="docutils literal"><span class="pre">m1</span></tt> with <tt class="docutils literal"><span class="pre">m2</span></tt></p>
 </td>
 </tr>
 </tbody>
@@ -1513,6 +1591,7 @@
 <li><a class="reference internal" href="#matrix">Matrix</a></li>
 <li><a class="reference internal" href="#matrix2">Matrix2</a></li>
 <li><a class="reference internal" href="#matrix3">Matrix3</a></li>
+<li><a class="reference internal" href="#matrix4">Matrix4</a></li>
 <li><a class="reference internal" href="#transform">Transform</a></li>
 </ul>
 </li>
