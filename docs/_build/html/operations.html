@@ -199,6 +199,44 @@
 </dd></dl>
 
 <dl class="function">
+<dt id="toRadians">
+<tt class="descname">toRadians</tt><big>(</big><em>angle</em><big>)</big><a class="headerlink" href="#toRadians" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>angle</strong> (<em>number</em>) &#8211; angle in degrees</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">angle in radians</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="toDegrees">
+<tt class="descname">toDegrees</tt><big>(</big><em>angle</em><big>)</big><a class="headerlink" href="#toDegrees" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>angle</strong> (<em>number</em>) &#8211; angle in radians</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">angle in degrees</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="toMathML">
 <tt class="descname">toMathML</tt><big>(</big><em>a</em><big>)</big><a class="headerlink" href="#toMathML" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
@@ -557,6 +595,48 @@
 <div class="section" id="vector2">
 <h2>Vector2<a class="headerlink" href="#vector2" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
+<dt id="transformPoint">
+<tt class="descname">transformPoint</tt><big>(</big><em>t</em>, <em>v</em><span class="optional">[</span>, <em>result</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#transformPoint" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>t</strong> (<a class="reference internal" href="types.html#Transform" title="Transform"><em>Transform</em></a>) &#8211; 2-dimensional transform</li>
+<li><strong>v</strong> (<a class="reference internal" href="types.html#Vector" title="Vector"><em>Vector</em></a>) &#8211; vector</li>
+<li><strong>result</strong> (<a class="reference internal" href="types.html#Vector" title="Vector"><em>Vector</em></a>) &#8211; result</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><tt class="docutils literal"><span class="pre">v</span></tt> transformed by <tt class="docutils literal"><span class="pre">t</span></tt></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="transformDirection">
+<tt class="descname">transformDirection</tt><big>(</big><em>t</em>, <em>v</em><span class="optional">[</span>, <em>result</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#transformDirection" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>t</strong> (<a class="reference internal" href="types.html#Transform" title="Transform"><em>Transform</em></a>) &#8211; 2-dimensional transform</li>
+<li><strong>v</strong> (<a class="reference internal" href="types.html#Vector" title="Vector"><em>Vector</em></a>) &#8211; vector</li>
+<li><strong>result</strong> (<a class="reference internal" href="types.html#Vector" title="Vector"><em>Vector</em></a>) &#8211; result</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><tt class="docutils literal"><span class="pre">v</span></tt> transformed by the linear part of <tt class="docutils literal"><span class="pre">t</span></tt></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="x">
 <tt class="descname">x</tt><big>(</big><span class="optional">[</span><em>result</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#x" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
@@ -635,6 +715,48 @@
 </div>
 <div class="section" id="vector3">
 <h2>Vector3<a class="headerlink" href="#vector3" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt>
+<tt class="descname">transformPoint</tt><big>(</big><em>t</em>, <em>v</em><span class="optional">[</span>, <em>result</em><span class="optional">]</span><big>)</big></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>t</strong> (<a class="reference internal" href="types.html#Transform" title="Transform"><em>Transform</em></a>) &#8211; 3-dimensional transform</li>
+<li><strong>v</strong> (<a class="reference internal" href="types.html#Vector" title="Vector"><em>Vector</em></a>) &#8211; vector</li>
+<li><strong>result</strong> (<a class="reference internal" href="types.html#Vector" title="Vector"><em>Vector</em></a>) &#8211; result</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><tt class="docutils literal"><span class="pre">v</span></tt> transformed by <tt class="docutils literal"><span class="pre">t</span></tt></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">transformDirection</tt><big>(</big><em>t</em>, <em>v</em><span class="optional">[</span>, <em>result</em><span class="optional">]</span><big>)</big></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>t</strong> (<a class="reference internal" href="types.html#Transform" title="Transform"><em>Transform</em></a>) &#8211; 3-dimensional transform</li>
+<li><strong>v</strong> (<a class="reference internal" href="types.html#Vector" title="Vector"><em>Vector</em></a>) &#8211; vector</li>
+<li><strong>result</strong> (<a class="reference internal" href="types.html#Vector" title="Vector"><em>Vector</em></a>) &#8211; result</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><tt class="docutils literal"><span class="pre">v</span></tt> transformed by the linear part of <tt class="docutils literal"><span class="pre">t</span></tt></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="function">
 <dt id="cross">
 <tt class="descname">cross</tt><big>(</big><em>v1</em>, <em>v2</em><span class="optional">[</span>, <em>result</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#cross" title="Permalink to this definition">¶</a></dt>
@@ -973,7 +1095,7 @@
 <h2>Matrix<a class="headerlink" href="#matrix" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="multiply">
-<tt class="descname">multiply</tt><big>(</big><em>m1</em>, <em>m2</em><span class="optional">[</span>, <em>reuslt</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#multiply" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">multiply</tt><big>(</big><em>m1</em>, <em>m2</em><span class="optional">[</span>, <em>result</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#multiply" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1114,6 +1236,31 @@
 <div class="section" id="matrix2">
 <h2>Matrix2<a class="headerlink" href="#matrix2" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
+<dt>
+<tt class="descname">multiply</tt><big>(</big><em>m1</em>, <em>m2</em><span class="optional">[</span>, <em>result</em><span class="optional">]</span><big>)</big></dt>
+<dd><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Optimized</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>m1</strong> (<a class="reference internal" href="types.html#Matrix" title="Matrix"><em>Matrix</em></a>) &#8211; first square matrix</li>
+<li><strong>m2</strong> (<a class="reference internal" href="types.html#Matrix" title="Matrix"><em>Matrix</em></a>) &#8211; second square matrix</li>
+<li><strong>result</strong> (<a class="reference internal" href="types.html#Matrix" title="Matrix"><em>Matrix</em></a>) &#8211; result</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the matrix product of <tt class="docutils literal"><span class="pre">m1</span></tt> with <tt class="docutils literal"><span class="pre">m2</span></tt></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="toAngle">
 <tt class="descname">toAngle</tt><big>(</big><em>m</em><big>)</big><a class="headerlink" href="#toAngle" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
@@ -1155,6 +1302,31 @@
 </div>
 <div class="section" id="matrix3">
 <h2>Matrix3<a class="headerlink" href="#matrix3" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt>
+<tt class="descname">multiply</tt><big>(</big><em>m1</em>, <em>m2</em><span class="optional">[</span>, <em>result</em><span class="optional">]</span><big>)</big></dt>
+<dd><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Optimized</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>m1</strong> (<a class="reference internal" href="types.html#Matrix" title="Matrix"><em>Matrix</em></a>) &#8211; first square matrix</li>
+<li><strong>m2</strong> (<a class="reference internal" href="types.html#Matrix" title="Matrix"><em>Matrix</em></a>) &#8211; second square matrix</li>
+<li><strong>result</strong> (<a class="reference internal" href="types.html#Matrix" title="Matrix"><em>Matrix</em></a>) &#8211; result</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the matrix product of <tt class="docutils literal"><span class="pre">m1</span></tt> with <tt class="docutils literal"><span class="pre">m2</span></tt></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="function">
 <dt id="toQuaternion">
 <tt class="descname">toQuaternion</tt><big>(</big><em>m</em><span class="optional">[</span>, <em>result</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#toQuaternion" title="Permalink to this definition">¶</a></dt>
@@ -1245,6 +1417,34 @@
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">rotation matrix</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="matrix4">
+<h2>Matrix4<a class="headerlink" href="#matrix4" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt>
+<tt class="descname">multiply</tt><big>(</big><em>m1</em>, <em>m2</em><span class="optional">[</span>, <em>result</em><span class="optional">]</span><big>)</big></dt>
+<dd><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Optimized</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>m1</strong> (<a class="reference internal" href="types.html#Matrix" title="Matrix"><em>Matrix</em></a>) &#8211; first square matrix</li>
+<li><strong>m2</strong> (<a class="reference internal" href="types.html#Matrix" title="Matrix"><em>Matrix</em></a>) &#8211; second square matrix</li>
+<li><strong>result</strong> (<a class="reference internal" href="types.html#Matrix" title="Matrix"><em>Matrix</em></a>) &#8211; result</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the matrix product of <tt class="docutils literal"><span class="pre">m1</span></tt> with <tt class="docutils literal"><span class="pre">m2</span></tt></p>
 </td>
 </tr>
 </tbody>
@@ -1391,6 +1591,7 @@
 <li><a class="reference internal" href="#matrix">Matrix</a></li>
 <li><a class="reference internal" href="#matrix2">Matrix2</a></li>
 <li><a class="reference internal" href="#matrix3">Matrix3</a></li>
+<li><a class="reference internal" href="#matrix4">Matrix4</a></li>
 <li><a class="reference internal" href="#transform">Transform</a></li>
 </ul>
 </li>

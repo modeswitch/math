@@ -1,3 +1,16 @@
+/*
+Copyright (c) 2012, Alan Kligman
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+    Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+    Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+    Neither the name of the Mozilla Foundation nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 ;(function(window, Math, undefined) {
   'use strict';
 
@@ -76,9 +89,6 @@
   // Types
   var NONE = 0;
   var TRANSFORM = 1;
-
-  // Temporary storage
-  var TMP0 = new Float32Array(16);
 
   /*
    * Constructors
@@ -665,51 +675,114 @@
     }
   }
 
+  /* Optimized multiplication for square matrices in 2, 3 and 4 dimensions
+     from from https://github.com/toji/gl-matrix/commit/4cbb9339ee074a7ad7e65fa7b40ca279d5253eef */
+
+  function matrix2_multiply(m1, m2, result) {
+    result = result || new Matrix(2, 2);
+
+    var a00 = m1[0], a01 = m1[1],
+        a10 = m1[2], a11 = m1[3],
+
+        b00 = m2[0], b01 = m2[1],
+        b10 = m2[2], b11 = m2[3];
+
+      result[0] = a00 * b00 + a01 * b10;
+      result[1] = a00 * b01 + a01 * b11;
+      result[2] = a10 * b00 + a11 * b10;
+      result[3] = a10 * b01 + a11 * b11;
+
+      return result;
+  }
+
+  function matrix3_multiply(m1, m2, result) {
+    result = result || new Matrix(3, 3);
+
+    var a00 = m1[0], a01 = m1[1], a02 = m1[2],
+        a10 = m1[3], a11 = m1[4], a12 = m1[5],
+        a20 = m1[6], a21 = m1[7], a22 = m1[8],
+
+        b00 = m2[0], b01 = m2[1], b02 = m2[2],
+        b10 = m2[3], b11 = m2[4], b12 = m2[5],
+        b20 = m2[6], b21 = m2[7], b22 = m2[8];
+
+    result[0] = a00 * b00 + a01 * b10 + a02 * b20;
+    result[1] = a00 * b01 + a01 * b11 + a02 * b21;
+    result[2] = a00 * b02 + a01 * b12 + a02 * b22;
+
+    result[3] = a10 * b00 + a11 * b10 + a12 * b20;
+    result[4] = a10 * b01 + a11 * b11 + a12 * b21;
+    result[5] = a10 * b02 + a11 * b12 + a12 * b22;
+
+    result[6] = a20 * b00 + a21 * b10 + a22 * b20;
+    result[7] = a20 * b01 + a21 * b11 + a22 * b21;
+    result[8] = a20 * b02 + a21 * b12 + a22 * a22;
+
+    return result;
+  }
+
+  function matrix4_multiply(m1, m2, result) {
+    result = result || new Matrix(4, 4);
+
+    var a00 = m1[0], a01 = m1[1], a02 = m1[2], a03 = m1[3],
+        a10 = m1[4], a11 = m1[5], a12 = m1[6], a13 = m1[7],
+        a20 = m1[8], a21 = m1[9], a22 = m1[10], a23 = m1[11],
+        a30 = m1[12], a31 = m1[13], a32 = m1[14], a33 = m1[15],
+
+        b00 = m2[0], b01 = m2[1], b02 = m2[2], b03 = m2[3],
+        b10 = m2[4], b11 = m2[5], b12 = m2[6], b13 = m2[7],
+        b20 = m2[8], b21 = m2[9], b22 = m2[10], b23 = m2[11],
+        b30 = m2[12], b31 = m2[13], b32 = m2[14], b33 = m2[15];
+
+    result[0] = a00 * b00 + a01 * b10 + a02 * b20 + a03 * b30;
+    result[1] = a00 * b01 + a01 * b11 + a02 * b21 + a03 * b31;
+    result[2] = a00 * b02 + a01 * b12 + a02 * b22 + a03 * b32;
+    result[3] = a00 * b03 + a01 * b13 + a02 * b23 + a03 * b33;
+    result[4] = a10 * b00 + a11 * b10 + a12 * b20 + a13 * b30;
+    result[5] = a10 * b01 + a11 * b11 + a12 * b21 + a13 * b31;
+    result[6] = a10 * b02 + a11 * b12 + a12 * b22 + a13 * b32;
+    result[7] = a10 * b03 + a11 * b13 + a12 * b23 + a13 * b33;
+    result[8] = a20 * b00 + a21 * b10 + a22 * b20 + a23 * b30;
+    result[9] = a20 * b01 + a21 * b11 + a22 * b21 + a23 * b31;
+    result[10] = a20 * b02 + a21 * b12 + a22 * b22 + a23 * b32;
+    result[11] = a20 * b03 + a21 * b13 + a22 * b23 + a23 * b33;
+    result[12] = a30 * b00 + a31 * b10 + a32 * b20 + a33 * b30;
+    result[13] = a30 * b01 + a31 * b11 + a32 * b21 + a33 * b31;
+    result[14] = a30 * b02 + a31 * b12 + a32 * b22 + a33 * b32;
+    result[15] = a30 * b03 + a31 * b13 + a32 * b23 + a33 * b33;
+
+    return result;
+  }
+
   function matrix_multiply(m1, m2, result) {
     var m1_size = m1.length;
     var m2_size = m2.length;
     var m1_dimension = readHeader(m1, DIMENSION);
     var m2_dimension = readHeader(m2, DIMENSION);
 
+    /*
     if(m1_dimension !== m2_size/m2_dimension) {
       throw new Error("arguments have mismatched rows and columns");
     }
-
-    // TODO: optimize for size 4, 9, 16
+    */
 
     var m = m1_size/m1_dimension;
     var p = m1_dimension;
     var n = m2_dimension;
-    var left, right;
 
-    if(result) {
-      var result_size = result.length;
-      var result_dimension = readHeader(result, DIMENSION);
-      if(result_size !== m * n ||
-         result_dimension !== n) {
-        throw new Error("result has mismatched dimensions");
-      }
-      if(m1 === result) {
-        TMP0.set(m1);
-        left = TMP0;
-        right = m2;
-      } else if(m2 === result) {
-        left = m1;
-        TMP0.set(m2);
-        right = TMP0;
-      }
-    } else {
-      result = new Matrix(m, n);
-      left = m1;
-      right = m2;
+    result = result || new Matrix(m, n);
+    if(result === m1) {
+      m1 = clone(m1);
+    } else if(result === m2) {
+      m2 = clone(m2);
     }
 
     var tmp;
     for(var i = 0; i < m; ++ i) {
-      for(var j = 0; j < n; ++ j) {
+      for(var j = 0; j < n; ++ j) {        
         tmp = 0;
-        for(var k = 0; k < p; ++k) {
-          tmp += left[p * i + k] * right[n * k + j];
+        for(var k = 0; k < p; ++k) {          
+          tmp += m1[p * i + k] * m2[n * k + j];
         }
         result[n * i + j] = tmp;
       }
@@ -936,10 +1009,6 @@
     return result;
   }
 
-  function matrix_extract(m, rowOffset, columnOffset, rows, columns, result) {
-
-  }
-
   var transform_translate_TMP_T2 = new Transform(2);
   var transform_translate_TMP_T3 = new Transform(3);
   function transform_translate(a, b, result) {
@@ -958,16 +1027,18 @@
     var transformDimension = readHeader(transform, DIMENSION) - 1;
     result = result || new Transform(transformDimension+1);
 
-    var tT;
+    var tT, multiply;
     if(3 === transformDimension) {
       tT = matrix_identity(transform_translate_TMP_T3);
       tT[3] = translation[0];
       tT[7] = translation[1];
       tT[11] = translation[2];
+      multiply = matrix4_multiply;
     } else if(2 === transformDimension) {
       tT = matrix_identity(transform_translate_TMP_T2);
       tT[2] = translation[0];
       tT[5] = translation[1];
+      multiply = matrix3_multiply;
     }
 
     if(first) {
@@ -975,7 +1046,7 @@
     } else {
       first = tT;
     }
-    matrix_multiply(first, second, result);
+    multiply(first, second, result);
     return result;
   }
 
@@ -999,7 +1070,7 @@
     var transformDimension = readHeader(transform, DIMENSION) - 1;
     result = result || new Transform(transformDimension+1);
 
-    var rT, rM, length;
+    var rT, rM, length, multiply;
     length = (typeof rotation === "number") ? 1 : rotation.length;
     if(3 === transformDimension) {
       if(3 === length) {
@@ -1023,6 +1094,7 @@
       rT[8] = rM[6];
       rT[9] = rM[7];
       rT[10] = rM[8];
+      multiply = matrix4_multiply;
     } else if(2 === transformDimension) {
       if(1 === length) {
         rM = matrix2_fromAngle(rotation, transform_rotate_TMP_M2);
@@ -1036,6 +1108,7 @@
       rT[1] = rM[1];
       rT[4] = rM[2];
       rT[5] = rM[3];
+      multiply = matrix3_multiply;
     }
 
     if(first) {
@@ -1043,7 +1116,7 @@
     } else {
       first = rT;
     }
-    matrix_multiply(first, second, result);
+    multiply(first, second, result);
     return result;
   }
 
@@ -1065,16 +1138,18 @@
     var transformDimension = readHeader(transform, DIMENSION) - 1;
     result = result || new Transform(transformDimension+1);
 
-    var sT;
+    var sT, multiply;
     if(3 === transformDimension) {
       sT = matrix_identity(transform_translate_TMP_T3);
       sT[0] = scaling[0];
       sT[5] = scaling[1];
       sT[10] = scaling[2];
+      multiply = matrix4_multiply;
     } else if(2 === transformDimension) {
       sT = matrix_identity(transform_translate_TMP_T3);
       sT[0] = scaling[0];
       sT[4] = scaling[1];
+      multiply = matrix3_multiply;
     }
 
     if(first) {
@@ -1082,7 +1157,7 @@
     } else {
       first = sT;
     }
-    matrix_multiply(first, second, result);
+    multiply(first, second, result);
     return result;
   }
 
@@ -1139,6 +1214,51 @@
     return result;
   }
 
+  function vector3_transform(w, t, v, result) {
+    result = result || new Vector(3);
+    var x = v[0], y = v[1], z = v[2];
+
+    result[0] = x*t[0] + y*t[1] + z*t[2] + w*t[3];
+    result[1] = x*t[4] + y*t[5] + z*t[6] + w*t[7];
+    result[2] = x*t[8] + y*t[9] + z*t[10] + w*t[11];
+
+    return result;
+  }
+
+  function vector2_transform(z, t, v, result) {
+    result = result || new Vector(3);
+    var x = v[0], y = v[1];
+
+    result[0] = x*t[0] + y*t[1] + z*t[2];
+    result[1] = x*t[3] + y*t[4] + z*t[5];
+
+    return result;
+  }
+
+  function toDegrees(angle) {
+    return angle*180/PI;
+  }
+
+  function toRadians(angle) {
+    return angle*PI/180;
+  }
+
+  function transform_linear(t, result) {
+    var d = readHeader(t, DIMENSION) - 1;
+    result = result || new Matrix(d, d);
+
+    if(3 === d) {
+      result[0] = t[0]; result[1] = t[1]; result[2] = t[2];
+      result[3] = t[4]; result[4] = t[5]; result[5] = t[6];
+      result[6] = t[8]; result[7] = t[9]; result[8] = t[10];
+    } else if(2 === d) {
+      result[0] = t[0]; result[1] = t[1];
+      result[2] = t[3]; result[2] = t[4];
+    }
+
+    return result;
+  }
+
   // Internal vector constants
   var X2 = vector_unit(0, 2);
   var Y2 = vector_unit(1, 2);
@@ -1177,8 +1297,8 @@
     toString: toString,
     clamp: scalar_clamp,
     // fraction: scalar_fraction,
-    toDegrees: undefined,
-    toRadians: undefined,
+    toDegrees: toDegrees,
+    toRadians: toRadians,
     vector: {
       length: vector_length,
       length2: vector_length2,
@@ -1196,12 +1316,16 @@
       one: vector_uniform.bind(undefined, 1)
     },
     vector2: {
+      transformPoint: vector2_transform.bind(undefined, 1),
+      transformDirection: vector2_transform.bind(undefined, 0),
       x: vector_unit.bind(undefined, 0, 2),
       y: vector_unit.bind(undefined, 1, 2),
       u: vector_unit.bind(undefined, 0, 2),
-      v: vector_unit.bind(undefined, 1, 2)
+      v: vector_unit.bind(undefined, 1, 2)      
     },
     vector3: {
+      transformPoint: vector3_transform.bind(undefined, 1),
+      transformDirection: vector3_transform.bind(undefined, 0),
       cross: vector3_cross,
       unproject: undefined,
       x: vector_unit.bind(undefined, 0, 3),
@@ -1230,20 +1354,25 @@
       inverse: matrix_inverse,
       transpose: matrix_transpose,  // Square matrix only!
       identity: matrix_identity,
-      extract: matrix_extract
+      extract: undefined
     },
     matrix2: {
+      multiply: matrix2_multiply,
       // Convert between rotation matrix and angle
       toAngle: matrix2_toAngle,
       fromAngle: matrix2_fromAngle
     },
     matrix3: {
+      multiply: matrix3_multiply,
       // Convert between rotation matrix and quaternion
       toQuaternion: undefined,
       fromQuaternion: matrix3_fromQuaternion,
       // Convert between rotation matrix and axis-angle
       toAxisAngle: undefined,
       fromAxisAngle: matrix3_fromAxisAngle
+    },
+    matrix4: {
+      multiply: matrix4_multiply
     },
     transform: {
       translate: transform_translate,
@@ -1252,7 +1381,7 @@
       // Singular value decomposition
       svd: undefined,
       // Extract the linear part of the transform
-      linear: undefined
+      linear: transform_linear
     }
   };
 
