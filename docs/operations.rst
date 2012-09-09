@@ -58,6 +58,16 @@ Operations
   :param number max: maximum value
   :returns: ``s`` restricted inside range of ``min`` to ``max``
 
+.. js:function:: toRadians(angle)
+
+  :param number angle: angle in degrees
+  :returns: angle in radians
+
+.. js:function:: toDegrees(angle)
+
+  :param number angle: angle in radians
+  :returns: angle in degrees
+
 .. js:function:: toMathML(a)
 
   :param Matrix a: buffer
@@ -171,6 +181,20 @@ Vector
 Vector2
 -------
 
+.. js:function:: transformPoint(t, v[, result])
+
+  :param Transform t: 2-dimensional transform
+  :param Vector v: vector
+  :param Vector result: result
+  :returns: ``v`` transformed by ``t``
+
+.. js:function:: transformDirection(t, v[, result])
+
+  :param Transform t: 2-dimensional transform
+  :param Vector v: vector
+  :param Vector result: result
+  :returns: ``v`` transformed by the linear part of ``t``
+
 .. js:function:: x([result])
 
   :param Vector result: result
@@ -193,6 +217,20 @@ Vector2
 
 Vector3
 -------
+
+.. js:function:: transformPoint(t, v[, result])
+
+  :param Transform t: 3-dimensional transform
+  :param Vector v: vector
+  :param Vector result: result
+  :returns: ``v`` transformed by ``t``
+
+.. js:function:: transformDirection(t, v[, result])
+
+  :param Transform t: 3-dimensional transform
+  :param Vector v: vector
+  :param Vector result: result
+  :returns: ``v`` transformed by the linear part of ``t``
 
 .. js:function:: cross(v1, v2[, result])
 
