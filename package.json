@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "test": "jshint . && NODE_PATH=$NODE_PATH:. jasmine-node --test-dir tests"
+    "test": "jshint . && NODE_PATH=$NODE_PATH:. jasmine-node --test-dir tests && uglifyjs src/m.js > /dev/null"
   },
   "engines": {
     "node": "0.8.x"
