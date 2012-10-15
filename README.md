@@ -15,7 +15,7 @@ var t = new M.Transform(3);
 // Translate and store the result back in t
 M.transform.translate(t, [1, 2, 0], t);
 
-// Pre-translate by by changing the parameter order
+// Pre-translate by changing the parameter order
 M.transform.translate([3, 0, 2], t, t);
 
 // Create a new 3D vector
