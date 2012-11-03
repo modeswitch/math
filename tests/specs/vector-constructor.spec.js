@@ -1,4 +1,4 @@
-var M = require("src/m");
+var M = require("src/math");
 
 describe("Vector", function() {
   describe("with dimensions", function() {
