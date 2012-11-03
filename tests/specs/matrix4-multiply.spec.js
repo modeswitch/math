@@ -1,4 +1,4 @@
-var M = require("src/m");
+var M = require("src/math");
 
 describe("matrix4 multiply", function() {
   describe("with result parameter", function() {

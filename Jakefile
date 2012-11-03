@@ -11,7 +11,7 @@ desc( "lint code" );
 task( "lint", [], require( "./tools/jake-tasks/lint" ) );
 
 desc( "compile code and documentation" );
-task( "build", ["src/m.js"], require( "./tools/jake-tasks/build" ) );
+task( "build", ["src/math.js"], require( "./tools/jake-tasks/build" ) );
 
 desc( "remove compiled code" );
 task( "clean", [], require( "./tools/jake-tasks/clean" ) );
