@@ -1,8 +1,8 @@
-# MathJS
+# Math
 
 [![Build Status](https://secure.travis-ci.org/gladiusjs/mathjs.png?branch=develop)](http://travis-ci.org/gladiusjs/mathjs)
 
-MathJS is a math and geometry library for JavaScript. It's optimized for use in high-performance computing applications like 3D games, and it can handle general-purpose operations on matrices and vectors.
+This is a math and geometry library for JavaScript. It's optimized for use in high-performance computing applications like 3D games, and it can handle general-purpose operations on matrices and vectors.
 
 ## Math for Games
 
