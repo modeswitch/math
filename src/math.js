@@ -171,18 +171,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     }
   }
 
-  function Quaternion(arg) {
-    var argc = arguments.length;
-    if(0 === argc) {
-      return new Vector(4);
-    } else if(1 === argc) {
-      // Components
-      return new Vector(arg);
-    } else {
-      throw new Error("invalid constructor invocation");
-    }
-  }
-
   function matrix4_frustum(left, right, bottom, top, near, far, result) {
     result = result || new Matrix(4, 4);
     var rl = (right - left);
@@ -501,7 +489,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
       result[2] = 0;
       result[3] = 1;
     } else {
-      result = new Quaternion();
+      result = new Vector(4);
       result[0] = 1;
     }
 
@@ -788,7 +776,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
   }
 
   function quaternion_inverse(q, result) {
-    result = result || new Quaternion();
+    result = result || new Vector(4);
 
     var q0 = q[0], q1 = q[1], q2 = q[2], q3 = q[3];
     var dot = q0*q0 + q1*q1 + q2*q2 + q3*q3;
@@ -811,7 +799,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
   }
 
   function quaternion_conjugate(q, result) {
-    result = result || new Quaternion();
+    result = result || new Vector(4);
 
     result[0] = -q[0];
     result[1] = -q[1];
@@ -1053,7 +1041,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
   // https://github.com/toji/gl-matrix/blob/master/gl-matrix.js#L2371
   function quaternion_slerp(q1, q2, s, result) {
-    result = result || new Quaternion();
+    result = result || new Vector(4);
 
     var cosHalfTheta = q1[0] * q2[0] + q1[1] * q2[1] + q1[2] * q2[2] + q1[3] * q2[3],
         halfTheta,
@@ -1093,7 +1081,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
   var quaternion_fromAxisAngle_TMP_V3 = new Vector(3);
   function quaternion_fromAxisAngle(aa, result) {
-    result = result || new Quaternion();
+    result = result || new Vector(4);
 
     var halfAngle = vector_length(aa)/2;
     var axis = vector_normalize(aa, quaternion_fromAxisAngle_TMP_V3);
@@ -1443,7 +1431,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     Matrix: Matrix,
     Transform: Transform,
     Vector: Vector,
-    Quaternion: Quaternion,    
 
     // Constants
     PI: PI,   
