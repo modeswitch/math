@@ -16,6 +16,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
   var sin = Math.sin;
   var cos = Math.cos;
+  var tan = Math.tan;
   var acos = Math.acos;
   var sqrt = Math.sqrt;
   var abs = Math.abs;
@@ -89,6 +90,11 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
   // Types
   var NONE = 0;
   var TRANSFORM = 1;
+  var FRUSTUM = 2;
+  var ORTHOGRAPHIC = 3;
+  var PERSPECTIVE = 4;
+  var LOOKAT = 5;
+  var QUATERNION = 6;
 
   /*
    * Constructors
@@ -136,22 +142,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     return matrix;
   }
 
-  function Transform(dimension) {
-    var argc = arguments.length;
-    if(1 === argc) {
-      // Create an identity matrix large enough to hold an affine transform
-      ++ dimension;
-      var transform = new Matrix(dimension, dimension);
-      writeHeader(transform, TYPE, TRANSFORM);
-      for(var i = 0, l = dimension; i < l; ++ i) {
-        transform[i * dimension + i] = 1;
-      }
-      return transform;
-    } else {
-      throw new Error("invalid constructor invocation");
-    }
-  }
-
   function Vector(arg) {
     var argc = arguments.length;
     if(1 === argc) {
@@ -170,16 +160,132 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     }
   }
 
-  function Quaternion() {
+  function Transform(dimension) {
     var argc = arguments.length;
-    if(0 === argc) {
-      return new Vector(4);
-    } else if(4 === argc) {
-      // Components
-      return new Vector(arguments[0], arguments[1], arguments[2], arguments[3]);
+    if(1 === argc) {
+      // Create an identity matrix large enough to hold an affine transform
+      ++ dimension;
+      var transform = new Matrix(dimension, dimension);
+      writeHeader(transform, TYPE, TRANSFORM);
+      for(var i = 0, l = dimension; i < l; ++ i) {
+        transform[i * dimension + i] = 1;
+      }
+      return transform;
     } else {
       throw new Error("invalid constructor invocation");
     }
+  }
+
+  function Quaternion(arg) {
+    var argc = arguments.length;
+    if(0 === argc) {
+      return new Vector(4);
+    } else if(1 === argc) {
+      // Components
+      return new Vector(arg);
+    } else {
+      throw new Error("invalid constructor invocation");
+    }
+  }
+
+  function Frustum(left, right, bottom, top, near, far) {
+    var rl = (right - left);
+    var tb = (top - bottom);
+    var fn = (far - near);
+
+    return new Matrix([
+          (near * 2) / rl,                  0,                      0, 0,
+                        0,    (near * 2) / tb,                      0, 0,
+      (right + left) / rl, -(far + near) / fn,                     -1, 0,
+                        0,                  0, -(far * near * 2) / fn, 0
+    ]);
+  }
+
+  function Perspective(fovy, aspect, near, far) {
+    var top = near * tan(fovy * PI / 360.0);
+    var right = top * aspect;
+    return new Frustum(-right, right, -top, top, near, far);
+  }
+
+  function Orthographic(left, right, bottom, top, near, far) {
+    var rl = (right - left);
+    var tb = (top - bottom);
+    var fn = (far - near);
+
+    return new Matrix([
+                    2 / rl,                    0,                  0, 0,
+                         0,               2 / tb,                  0, 0,
+                         0,                    0,            -2 / fn, 0,
+      -(left + right) / rl, -(top + bottom) / tb, -(far + near) / fn, 1
+    ]);
+  }
+
+  function LookAt(eye, center, up) {
+    var x0, x1, x2, y0, y1, y2, z0, z1, z2, len,
+        eyex = eye[0],
+        eyey = eye[1],
+        eyez = eye[2],
+        upx = up[0],
+        upy = up[1],
+        upz = up[2],
+        centerx = center[0],
+        centery = center[1],
+        centerz = center[2];
+
+    if (eyex === centerx && eyey === centery && eyez === centerz) {
+      return matrix_identity(new Matrix(4, 4));
+    }
+
+    //vec3.direction(eye, center, z);
+    z0 = eyex - centerx;
+    z1 = eyey - centery;
+    z2 = eyez - centerz;
+
+    // normalize (no check needed for 0 because of early return)
+    len = 1 / sqrt(z0 * z0 + z1 * z1 + z2 * z2);
+    z0 *= len;
+    z1 *= len;
+    z2 *= len;
+
+    //vec3.normalize(vec3.cross(up, z, x));
+    x0 = upy * z2 - upz * z1;
+    x1 = upz * z0 - upx * z2;
+    x2 = upx * z1 - upy * z0;
+    len = sqrt(x0 * x0 + x1 * x1 + x2 * x2);
+    if (!len) {
+        x0 = 0;
+        x1 = 0;
+        x2 = 0;
+    } else {
+        len = 1 / len;
+        x0 *= len;
+        x1 *= len;
+        x2 *= len;
+    }
+
+    //vec3.normalize(vec3.cross(z, x, y));
+    y0 = z1 * x2 - z2 * x1;
+    y1 = z2 * x0 - z0 * x2;
+    y2 = z0 * x1 - z1 * x0;
+
+    len = sqrt(y0 * y0 + y1 * y1 + y2 * y2);
+    if (!len) {
+        y0 = 0;
+        y1 = 0;
+        y2 = 0;
+    } else {
+        len = 1 / len;
+        y0 *= len;
+        y1 *= len;
+        y2 *= len;
+    }
+
+    return new Matrix([
+                                        x0,                                   y0,                                   z0, 0,
+                                        x1,                                   y1,                                   z1, 0,
+                                        x2,                                   y2,                                   z2, 0,
+      -(x0 * eyex + x1 * eyey + x2 * eyez), -(y0 * eyex + y1 * eyey + y2 * eyez), -(z0 * eyex + z1 * eyey + z2 * eyez), 1
+    ]);
   }
 
   /*
