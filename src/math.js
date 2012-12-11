@@ -591,11 +591,11 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     tV[3] = 1.0;
 
     matrix4_multiply(projection, view, tM);
-    if(!mat4.inverse(m)) { 
+    if(!matrix_inverse(tM)) { 
       throw new Error("non-invertable matrix");
     }
 
-    mat4.multiplyVec4(tM, tV, tM);
+    matrix4_multiply(tM, tV, tM);
     if(tV[3] === 0.0) {
       throw new Error("zero scalar");
     }
@@ -1354,7 +1354,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
       transformPoint: vector3_transform.bind(undefined, 1),
       transformDirection: vector3_transform.bind(undefined, 0),
       cross: vector3_cross,
-      unproject: unproject,
+      unproject: vector3_unproject,
       x: vector_unit.bind(undefined, 0, 3),
       y: vector_unit.bind(undefined, 1, 3),
       z: vector_unit.bind(undefined, 2, 3)
