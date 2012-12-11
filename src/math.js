@@ -84,17 +84,12 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
   }
 
   // Offsets
-  var DIMENSION = 0;
-  var TYPE =  1;
+  var DIMENSION = 0x0;
+  var TYPE      = 0x1;
 
   // Types
-  var NONE = 0;
-  var TRANSFORM = 1;
-  var FRUSTUM = 2;
-  var ORTHOGRAPHIC = 3;
-  var PERSPECTIVE = 4;
-  var LOOKAT = 5;
-  var QUATERNION = 6;
+  var MATRIX    = 0x0;
+  var TRANSFORM = 0x1;
 
   /*
    * Constructors
@@ -188,39 +183,66 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     }
   }
 
-  function Frustum(left, right, bottom, top, near, far) {
+  function matrix4_frustum(left, right, bottom, top, near, far, result) {
+    result = result || new Matrix(4, 4);
     var rl = (right - left);
     var tb = (top - bottom);
     var fn = (far - near);
 
-    return new Matrix([
-          (near * 2) / rl,                  0,                      0, 0,
-                        0,    (near * 2) / tb,                      0, 0,
-      (right + left) / rl, -(far + near) / fn,                     -1, 0,
-                        0,                  0, -(far * near * 2) / fn, 0
-    ]);
+    result[0] = (near * 2) / rl;
+    result[1] = 0;
+    result[2] = 0;
+    result[3] = 0;
+    result[4] = 0;
+    result[5] = (near * 2) / tb;
+    result[6] = 0;
+    result[7] = 0;
+    result[8] = (right + left) / rl;
+    result[9] = -(far + near) / fn;
+    result[10] = -1;
+    result[11] = 0;
+    result[12] = 0;
+    result[13] = 0;
+    result[14] = -(far * near * 2) / fn;
+    result[15] = 0;
+
+    return result;
   }
 
-  function Perspective(fovy, aspect, near, far) {
+  function matrix4_perspective(fovy, aspect, near, far, result) {
     var top = near * tan(fovy * PI / 360.0);
     var right = top * aspect;
-    return new Frustum(-right, right, -top, top, near, far);
+    return matrix4_frustum(-right, right, -top, top, near, far, result);
   }
 
-  function Orthographic(left, right, bottom, top, near, far) {
+  function matrix4_orthographic(left, right, bottom, top, near, far, result) {
+    result = result || new Matrix(4, 4);
     var rl = (right - left);
     var tb = (top - bottom);
     var fn = (far - near);
 
-    return new Matrix([
-                    2 / rl,                    0,                  0, 0,
-                         0,               2 / tb,                  0, 0,
-                         0,                    0,            -2 / fn, 0,
-      -(left + right) / rl, -(top + bottom) / tb, -(far + near) / fn, 1
-    ]);
+    result[0] = 2 / rl;
+    result[1] = 0;
+    result[2] = 0;
+    result[3] = 0;
+    result[4] = 0;
+    result[5] = 2 / tb;
+    result[6] = 0;
+    result[7] = 0;
+    result[8] = 0;
+    result[9] = 0;
+    result[10] = -2 / fn;
+    result[11] = 0;
+    result[12] = -(left + right) / rl;
+    result[13] = -(top + bottom) / tb;
+    result[14] = -(far + near) / fn;
+    result[15] = 1;
+
+    return result;
   }
 
-  function LookAt(eye, center, up) {
+  function matrix4_lookAt(eye, center, up, result) {
+    result = result || new Matrix(4, 4);
     var x0, x1, x2, y0, y1, y2, z0, z1, z2, len,
         eyex = eye[0],
         eyey = eye[1],
@@ -233,7 +255,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
         centerz = center[2];
 
     if (eyex === centerx && eyey === centery && eyez === centerz) {
-      return matrix_identity(new Matrix(4, 4));
+      return matrix_identity(result);
     }
 
     //vec3.direction(eye, center, z);
@@ -280,12 +302,24 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
         y2 *= len;
     }
 
-    return new Matrix([
-                                        x0,                                   y0,                                   z0, 0,
-                                        x1,                                   y1,                                   z1, 0,
-                                        x2,                                   y2,                                   z2, 0,
-      -(x0 * eyex + x1 * eyey + x2 * eyez), -(y0 * eyex + y1 * eyey + y2 * eyez), -(z0 * eyex + z1 * eyey + z2 * eyez), 1
-    ]);
+    result[0] = x0;
+    result[1] = y0;
+    result[2] = z0;
+    result[3] = 0;
+    result[4] = x1;
+    result[5] = y1;
+    result[6] = z1;
+    result[7] = 0;
+    result[8] = x2;
+    result[9] = y2;
+    result[10] = z2;
+    result[11] = 0;
+    result[12] = -(x0 * eyex + x1 * eyey + x2 * eyez);
+    result[13] = -(y0 * eyex + y1 * eyey + y2 * eyez);
+    result[14] = -(z0 * eyex + z1 * eyey + z2 * eyez);
+    result[15] = 1;
+
+    return result;
   }
 
   /*
@@ -1409,11 +1443,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     Matrix: Matrix,
     Transform: Transform,
     Vector: Vector,
-    Quaternion: Quaternion,
-    Frustum: undefined,
-    Perspective: undefined,
-    Orthographic: undefined,
-    LookAt: undefined,      
+    Quaternion: Quaternion,    
 
     // Constants
     PI: PI,   
@@ -1505,7 +1535,11 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
       fromAxisAngle: matrix3_fromAxisAngle
     },
     matrix4: {
-      multiply: matrix4_multiply
+      multiply: matrix4_multiply,
+      frustum: matrix4_frustum,
+      perspective: matrix4_perspective,
+      orthographic: matrix4_orthographic,
+      lookAt: matrix4_lookAt
     },
     transform: {
       translate: transform_translate,
