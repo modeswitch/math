@@ -576,8 +576,35 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     return result;
   }
 
+  /* From https://github.com/toji/gl-matrix/blob/4cbb9339ee074a7ad7e65fa7b40ca279d5253eef/gl-matrix.js#L455 */
+  var vector3_unproject_TMP_M4 = new Matrix(4, 4);
+  var vector3_unproject_TMP_V4 = new Vector(4);
   function vector3_unproject(v, view, projection, viewport, result) {
+    result = result || new Vector(3);
 
+    var tM = vector3_unproject_TMP_M4;
+    var tV = vector3_unproject_TMP_V4;
+
+    tV[0] = (v[0] - viewport[0]) * 2.0 / viewport[2] - 1.0;
+    tV[1] = (v[1] - viewport[1]) * 2.0 / viewport[3] - 1.0;
+    tV[2] = 2.0 * v[2] - 1.0;
+    tV[3] = 1.0;
+
+    matrix4_multiply(projection, view, tM);
+    if(!mat4.inverse(m)) { 
+      throw new Error("non-invertable matrix");
+    }
+
+    mat4.multiplyVec4(tM, tV, tM);
+    if(tV[3] === 0.0) {
+      throw new Error("zero scalar");
+    }
+
+    result[0] = tV[0] / tV[3];
+    result[1] = tV[1] / tV[3];
+    result[2] = tV[2] / tV[3];
+
+    return result;
   }
 
   function toMathML(a) {
