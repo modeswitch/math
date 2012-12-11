@@ -1354,7 +1354,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
       transformPoint: vector3_transform.bind(undefined, 1),
       transformDirection: vector3_transform.bind(undefined, 0),
       cross: vector3_cross,
-      unproject: undefined,
+      unproject: unproject,
       x: vector_unit.bind(undefined, 0, 3),
       y: vector_unit.bind(undefined, 1, 3),
       z: vector_unit.bind(undefined, 2, 3)
